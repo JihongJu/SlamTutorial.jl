@@ -52,6 +52,14 @@ function draw_state(canvas, timestep, belief, observed, sensor, landmarks)
         draw_gaussian(canvas, belief.μ[2*i+2:2*i+3], belief.Σ[2*i+2:2*i+3,2*i+2:2*i+3])
     end
 
+    # Draw sensors
+    for i in 1:size(sensor,2)
+		mx = belief.μ(2*sensor(i).id+2);
+		my = belief.μ(2*sensor(i).id+3);
+    	line = matplotlib.lines.Line2D([belief.μ[1], mx], [belief.μ[2], my], color='k')
+		canvas.add_line(line)
+    end
+
     # Draw ground truth landmarks
     draw_landmarks(canvas, landmarks)
 
