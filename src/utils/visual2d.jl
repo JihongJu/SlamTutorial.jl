@@ -1,5 +1,9 @@
+module visual2d
+export make_canvas, draw_landmarks, draw_robot, draw_gaussian, draw_state
+
 using PyPlot
 using LinearAlgebra
+
 
 
 function make_canvas(xmin, ymin, xmax, ymax)
@@ -17,17 +21,17 @@ function draw_landmarks(canvas, landmarks)
 end
 
 
-function draw_robot(canvas, pose)
+function draw_robot(canvas, pose, color="royalblue")
     x, y, θ = pose
 
-    canvas.scatter(x, y, marker="o", c="dodgerblue")
-    head = matplotlib.markers.MarkerStyle(matplotlib.markers.TICKRIGHT)
-    head._transform.rotate(θ)
-    canvas.scatter(x, y, marker=head, color="dodgerblue")
+    canvas.scatter(x, y, marker="o", color=color)
+    heading = matplotlib.markers.MarkerStyle(matplotlib.markers.TICKRIGHT)
+    heading._transform.rotate(θ)
+    canvas.scatter(x, y, marker=heading, color=color)
 end
 
 
-function draw_gaussian(canvas, mu, sigma, nstd=1)
+function draw_gaussian(canvas, mu, sigma, nstd=1, color="tomato")
     factn = eigen(sigma)
 
     width, height = 2 * nstd * sqrt.(factn.values)
@@ -36,26 +40,28 @@ function draw_gaussian(canvas, mu, sigma, nstd=1)
     angle = atan(firstvec[2], firstvec[1]) * 360 /2π
 
     ell = matplotlib.patches.Ellipse(mu, width, height,
-        angle=angle, linewidth=2, zorder=2, alpha=0.5)
+        angle=angle, linewidth=2, zorder=2, alpha=0.5, color=color)
     canvas.add_patch(ell)
 end
 
 
-function draw_state(canvas, timestep, belief, observed, sensor, landmarks)
+function draw_state(canvas, timestep, belief, observed, sensor_data, landmarks)
+	robot_mu = belief.mu[1:3]
+	robot_sigma = belief.sigma[1:3, 1:3]
     # Draw robot
-    draw_robot(canvas, belief.μ[1:3])  # Turn into a proper robot drawing
-    draw_gaussian(canvas, belief.μ[1:2], belief.Σ[1:2, 1:2])
+    draw_robot(canvas, robot_mu, color="royalblue")
+	draw_gaussian(canvas, robot_mu[1:2], robot_sigma[1:2, 1:2], color="royalblue")
 
     # Draw observed landmarks
     for i in 1:length(observed)
-        canvas.scatter(belief.μ[2*i+2], belief.μ[2*i+3], marker='o')
-        draw_gaussian(canvas, belief.μ[2*i+2:2*i+3], belief.Σ[2*i+2:2*i+3,2*i+2:2*i+3])
+        canvas.scatter(belief.mu[2*i+2], belief.mu[2*i+3], marker='o')
+        draw_gaussian(canvas, belief.mu[2*i+2:2*i+3], belief.sigma[2*i+2:2*i+3,2*i+2:2*i+3])
     end
 
-    # Draw sensors
+    # Draw sensor rays
     for i in 1:size(sensor,2)
-		mx = belief.μ(2*sensor(i).id+2);
-		my = belief.μ(2*sensor(i).id+3);
+		mx = belief.μ(2*sensor_data(i).id+2);
+		my = belief.μ(2*sensor_data(i).id+3);
     	line = matplotlib.lines.Line2D([belief.μ[1], mx], [belief.μ[2], my], color='k')
 		canvas.add_line(line)
     end
@@ -67,18 +73,4 @@ function draw_state(canvas, timestep, belief, observed, sensor, landmarks)
 end
 
 
-function test_draw_state()
-    canvas = make_canvas(-2, -2, 12, 12)
-
-    draw_robot(canvas, [3, 4, π/6])
-
-    landmarks = [2 1; 0 4; 2 7; 9 2; 10 5; 9 8; 5 5; 5 3; 5 9]
-    draw_landmarks(canvas, landmarks)
-
-    μ = [5, 5]
-    Σ = [1 0.5; 0.5 3]
-    draw_gaussian(canvas, μ, Σ)
-
 end
-
-test_draw_state()
