@@ -9,7 +9,7 @@ end
 
 
 function load_sensor_data()
-    return open("src/data/slam_course_example.dat") do file
+    return open(joinpath(@__DIR__, "slam_course_example.dat")) do file
         odometry::Array{Odometry, 1} = []
         sensor::Array{Array, 1} = []
         observations::Array{SensorData, 1} = []

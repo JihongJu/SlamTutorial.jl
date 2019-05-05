@@ -17,21 +17,20 @@ end
 
 function draw_landmarks(canvas, landmarks)
     canvas.scatter(landmarks[:, 1], landmarks[:, 2], marker="+", color="r")
-    return canvas
 end
 
 
-function draw_robot(canvas, pose, color="royalblue")
+function draw_robot(canvas, pose; color="royalblue")
     x, y, θ = pose
 
     canvas.scatter(x, y, marker="o", color=color)
     heading = matplotlib.markers.MarkerStyle(matplotlib.markers.TICKRIGHT)
     heading._transform.rotate(θ)
-    canvas.scatter(x, y, marker=heading, color=color)
+    canvas.scatter(x, y, marker=heading, color=color, alpha=0.8)
 end
 
 
-function draw_gaussian(canvas, mu, sigma, nstd=1, color="tomato")
+function draw_gaussian(canvas, mu, sigma; nstd=1, color="tomato")
     factn = eigen(sigma)
 
     width, height = 2 * nstd * sqrt.(factn.values)
@@ -45,7 +44,7 @@ function draw_gaussian(canvas, mu, sigma, nstd=1, color="tomato")
 end
 
 
-function draw_state(canvas, timestep, belief, observed, sensor_data, landmarks)
+function draw_state(canvas, timestep, belief, observed_landmarks, sensor_data, landmarks)
 	robot_mu = belief.mu[1:3]
 	robot_sigma = belief.sigma[1:3, 1:3]
     # Draw robot
@@ -53,23 +52,25 @@ function draw_state(canvas, timestep, belief, observed, sensor_data, landmarks)
 	draw_gaussian(canvas, robot_mu[1:2], robot_sigma[1:2, 1:2], color="royalblue")
 
     # Draw observed landmarks
-    for i in 1:length(observed)
-        canvas.scatter(belief.mu[2*i+2], belief.mu[2*i+3], marker='o')
-        draw_gaussian(canvas, belief.mu[2*i+2:2*i+3], belief.sigma[2*i+2:2*i+3,2*i+2:2*i+3])
+    for (i, observed) in enumerate(observed_landmarks)
+		if observed
+	        canvas.scatter(belief.mu[2*i+2], belief.mu[2*i+3], marker="X", color="r", alpha=0.8)
+	        draw_gaussian(canvas, belief.mu[2*i+2:2*i+3], belief.sigma[2*i+2:2*i+3,2*i+2:2*i+3], color="tomato")
+		end
     end
 
     # Draw sensor rays
-    for i in 1:size(sensor,2)
-		mx = belief.μ(2*sensor_data(i).id+2);
-		my = belief.μ(2*sensor_data(i).id+3);
-    	line = matplotlib.lines.Line2D([belief.μ[1], mx], [belief.μ[2], my], color='k')
-		canvas.add_line(line)
+	lines = []
+    for sensor in sensor_data
+		hit = belief.mu[2*sensor.id+2:2*sensor.id+3]
+		push!(lines, [robot_mu[1:2], hit])
     end
+	line = matplotlib.collections.LineCollection(lines)
+	canvas.add_collection(line)
 
     # Draw ground truth landmarks
     draw_landmarks(canvas, landmarks)
 
-    return
 end
 
 
