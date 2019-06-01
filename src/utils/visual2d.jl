@@ -16,7 +16,7 @@ end
 
 
 function draw_landmarks(canvas, landmarks)
-    canvas.scatter(landmarks[:, 1], landmarks[:, 2], marker="+", color="r")
+    canvas.scatter(landmarks[:, 1], landmarks[:, 2], marker="*", color="r")
 end
 
 
@@ -65,7 +65,7 @@ function draw_state(canvas, timestep, belief, observed_landmarks, sensor_data, l
 		hit = belief.mu[2*sensor.id+2:2*sensor.id+3]
 		push!(lines, [robot_mu[1:2], hit])
     end
-	line = matplotlib.collections.LineCollection(lines)
+	line = matplotlib.collections.LineCollection(lines, linestyle="dotted")
 	canvas.add_collection(line)
 
     # Draw ground truth landmarks

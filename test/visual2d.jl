@@ -1,13 +1,6 @@
 using PyPlot
-
 include("src/utils/visual2d.jl")
-
-
-include("src/data/sensor2d.jl")
-
-include("src/ekfslam2d.jl")
-using .ekfslam2d
-
+import .visual2d
 
 function test_draw_robot()
     canvas = visual2d.make_canvas(-2, -2, 12, 12)
