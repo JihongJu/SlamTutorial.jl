@@ -8,13 +8,6 @@ struct Odometry
 end
 
 
-struct SensorData
-    id::Int8
-    range::Float32
-    bearing::Float32
-end
-
-
 function odometry_model(pose, odometry)
     x, y, θ = pose
     direction = θ + odometry.rot1
@@ -23,6 +16,21 @@ function odometry_model(pose, odometry)
     θ += odometry.rot1 + odometry.rot2
     θ = rem2pi(θ, RoundNearest)  # Round to [-π, π]
     return [x, y, θ]
+end
+
+
+struct Observation
+    landmark_id::Int8
+    range::Float32
+    bearing::Float32
+end
+
+
+function range_bearing_model(robot_pose, observation)
+    x, y, θ = robot_pose
+    mx = x + observation.range * cos(observation.bearing + θ)
+    my = y + observation.range * sin(observation.bearing + θ)
+    return [mx, my]
 end
 
 end

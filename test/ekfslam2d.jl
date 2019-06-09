@@ -14,8 +14,8 @@ end
 
 
 function test_load_sensor_data()
-    odometry, sensor = slam_course_example.load_sensor_data()
-    @test length(odometry) == length(sensor)
+    odometries, observationss = slam_course_example.load_sensor_data()
+    @test length(odometries) == length(observationss)
 end
 
 

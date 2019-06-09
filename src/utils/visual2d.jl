@@ -23,7 +23,7 @@ end
 function draw_robot(canvas, pose; color="royalblue")
     x, y, θ = pose
 
-    canvas.scatter(x, y, marker="o", color=color)
+    canvas.scatter(x, y, marker="o", color=color, alpha=0.8)
     heading = matplotlib.markers.MarkerStyle(matplotlib.markers.TICKRIGHT)
     heading._transform.rotate(θ)
     canvas.scatter(x, y, marker=heading, color=color, alpha=0.8)
@@ -44,26 +44,27 @@ function draw_gaussian(canvas, mu, sigma; nstd=1, color="tomato")
 end
 
 
-function draw_state(canvas, timestep, belief, observed_landmarks, sensor_data, landmarks)
-	robot_mu = belief.mu[1:3]
-	robot_sigma = belief.sigma[1:3, 1:3]
+function draw_state(canvas, timestep, belief, observations, landmarks)
+	robot_mu = belief.mean[1:3]
+	robot_sigma = belief.covariance[1:3, 1:3]
     # Draw robot
     draw_robot(canvas, robot_mu, color="royalblue")
 	draw_gaussian(canvas, robot_mu[1:2], robot_sigma[1:2, 1:2], color="royalblue")
 
     # Draw observed landmarks
-    for (i, observed) in enumerate(observed_landmarks)
-		if observed
-	        canvas.scatter(belief.mu[2*i+2], belief.mu[2*i+3], marker="X", color="r", alpha=0.8)
-	        draw_gaussian(canvas, belief.mu[2*i+2:2*i+3], belief.sigma[2*i+2:2*i+3,2*i+2:2*i+3], color="tomato")
+	num_landmarks = size(landmarks, 1)
+    for i in 1:num_landmarks
+		if !ismissing(belief.mean[2*i+2])
+	        canvas.scatter(belief.mean[2*i+2], belief.mean[2*i+3], marker="X", color="grey", alpha=0.8)
+	        draw_gaussian(canvas, belief.mean[2*i+2:2*i+3], belief.covariance[2*i+2:2*i+3,2*i+2:2*i+3], color="grey")
 		end
     end
 
     # Draw sensor rays
 	lines = []
-    for sensor in sensor_data
-		hit = belief.mu[2*sensor.id+2:2*sensor.id+3]
-		push!(lines, [robot_mu[1:2], hit])
+    for observation in observations
+		landmark_mu = belief.mean[2*observation.landmark_id+2:2*observation.landmark_id+3]
+		push!(lines, [robot_mu[1:2], landmark_mu])
     end
 	line = matplotlib.collections.LineCollection(lines, linestyle="dotted")
 	canvas.add_collection(line)
