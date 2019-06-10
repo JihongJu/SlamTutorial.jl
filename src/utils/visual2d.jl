@@ -56,7 +56,9 @@ function draw_state(canvas, timestep, belief, observations, landmarks)
     for i in 1:num_landmarks
 		if !ismissing(belief.mean[2*i+2])
 	        canvas.scatter(belief.mean[2*i+2], belief.mean[2*i+3], marker="X", color="grey", alpha=0.8)
-	        draw_gaussian(canvas, belief.mean[2*i+2:2*i+3], belief.covariance[2*i+2:2*i+3,2*i+2:2*i+3], color="grey")
+			if belief.covariance[2*i+2,2*i+2] < 1000
+		        draw_gaussian(canvas, belief.mean[2*i+2:2*i+3], belief.covariance[2*i+2:2*i+3,2*i+2:2*i+3], color="grey")
+			end
 		end
     end
 

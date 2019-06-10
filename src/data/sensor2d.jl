@@ -9,13 +9,13 @@ end
 
 
 function odometry_model(pose, odometry)
-    x, y, θ = pose
-    direction = θ + odometry.rot1
-    x += odometry.trans * cos(direction)
-    y += odometry.trans * sin(direction)
-    θ += odometry.rot1 + odometry.rot2
-    θ = rem2pi(θ, RoundNearest)  # Round to [-π, π]
-    return [x, y, θ]
+    rx, ry, rθ = pose
+    direction = rθ + odometry.rot1
+    rx += odometry.trans * cos(direction)
+    ry += odometry.trans * sin(direction)
+    rθ += odometry.rot1 + odometry.rot2
+    rθ = rem2pi(rθ, RoundNearest)  # Round to [-π, π]
+    return [rx, ry, rθ]
 end
 
 
@@ -27,9 +27,9 @@ end
 
 
 function range_bearing_model(robot_pose, observation)
-    x, y, θ = robot_pose
-    mx = x + observation.range * cos(observation.bearing + θ)
-    my = y + observation.range * sin(observation.bearing + θ)
+    rx, ry, rθ = robot_pose
+    mx = rx + observation.range * cos(observation.bearing + rθ)
+    my = ry + observation.range * sin(observation.bearing + rθ)
     return [mx, my]
 end
 
