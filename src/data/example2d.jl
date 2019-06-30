@@ -23,7 +23,7 @@ function example2d_sensor_data()
                 push!(odometries, Odometry(readings...))
                 if num > 1
                     push!(range_bearingss, range_bearings)
-                    RangeBearings = []
+                    range_bearings = []
                 end
             end
 

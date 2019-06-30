@@ -14,7 +14,8 @@ end
 
 
 function make_animation(figure, artists; interval=500, repeat_delay=1000)
-	close()
+	ioff()
+	PyPlot.isjulia_display[1] = false
     return animation.ArtistAnimation(figure, artists, interval=interval, repeat_delay=repeat_delay)
 end
 
@@ -92,5 +93,16 @@ function draw_kalman_state(ax, belief, range_bearings, landmarks)
     push!(artists, landmarks_true)
 
     return artists
+end
 
+
+function animate_kalman_state(canvas, believes, range_bearingss, landmarks)
+    fig, ax = make_canvas(-1, -1, 12, 12)
+    frames = []
+    for t in 1:length(believes)
+        frame = draw_kalman_state(ax, believes[t], range_bearingss[t], landmarks)
+
+        push!(frames, frame)
+    end
+    return make_animation(fig, frames, interval=1000, repeat_delay=1000)
 end
