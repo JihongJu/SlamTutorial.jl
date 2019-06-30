@@ -1,0 +1,9 @@
+name = "SlamTutorial"
+uuid = "94bac306-920f-11e9-2cb9-335deda059ba"
+authors = ["Jihong Ju <ir.jihong.ju@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
