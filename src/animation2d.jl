@@ -2,7 +2,6 @@ using PyPlot
 using LinearAlgebra
 
 using PyCall
-animation = pyimport("matplotlib.animation")
 
 
 function make_canvas(xmin, ymin, xmax, ymax)
@@ -14,6 +13,7 @@ end
 
 
 function make_animation(figure, artists; interval=500, repeat_delay=1000)
+	animation = pyimport("matplotlib.animation")
 	PyPlot.isjulia_display[1] = false
     return animation.ArtistAnimation(figure, artists, interval=interval, repeat_delay=repeat_delay)
 end
@@ -100,8 +100,7 @@ function animate_kalman_state(canvas, believes, range_bearingss, landmarks)
     frames = []
     for t in 1:length(believes)
         frame = draw_kalman_state(ax, believes[t], range_bearingss[t], landmarks)
-
         push!(frames, frame)
     end
-    return make_animation(fig, frames, interval=1000, repeat_delay=1000)
+    return make_animation(fig, frames)
 end
