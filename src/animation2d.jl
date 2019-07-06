@@ -97,6 +97,7 @@ end
 
 
 function animate_kalman_state(canvas, believes, range_bearingss, landmarks)
+    fig, ax = canvas
     frames = []
     for t in 1:length(believes)
         frame = draw_kalman_state(ax, believes[t], range_bearingss[t], landmarks)
