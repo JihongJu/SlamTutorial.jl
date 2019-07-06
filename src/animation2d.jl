@@ -14,7 +14,6 @@ end
 
 
 function make_animation(figure, artists; interval=500, repeat_delay=1000)
-	ioff()
 	PyPlot.isjulia_display[1] = false
     return animation.ArtistAnimation(figure, artists, interval=interval, repeat_delay=repeat_delay)
 end
