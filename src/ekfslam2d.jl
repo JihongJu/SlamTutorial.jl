@@ -51,7 +51,7 @@ function correction_step(belief, range_bearings)
 	num_dim_state = length(belief.mean)
 
 	H = Matrix{Float32}(undef, 2 * num_range_bearings, num_dim_state) # Jacobian matrix ∂ẑ/∂(rx,ry)
-	zs, ẑs = [], []  # true and predicted RangeBearings
+	zs, ẑs = [], []  # true and predicted observations
 
     for (i, range_bearing) in enumerate(range_bearings)
 		mid = range_bearing.landmark_id
@@ -72,7 +72,7 @@ function correction_step(belief, range_bearings)
 
 	 	ẑs = [ẑs; sqrtq; atan(δ[2], δ[1]) - rθ]
 
-		# Compute the Jacobian Hi of the measurement function h for this RangeBearing
+		# Compute the Jacobian Hi of the measurement function h for this observation
 		δx, δy = δ
 		Hi = zeros(Float32, 2, num_dim_state)
 		Hi[1:2, 1:3] = [
